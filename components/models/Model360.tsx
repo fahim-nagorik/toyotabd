@@ -8,7 +8,7 @@ import {
   model360Frames,
   type Model360ColorKey,
 } from "@/lib/model360";
-import { RAV4_HOTSPOTS } from "@/lib/rav4";
+import { RAV4_HOTSPOTS, RAV4_VIEWER_SENSITIVITY } from "@/lib/rav4";
 
 interface Model360Props {
   slug: string;
@@ -26,6 +26,7 @@ export default function Model360({ slug, name }: Model360Props) {
         <Viewer360
           frames={frames}
           hotspots={slug === "rav4" ? RAV4_HOTSPOTS : []}
+          sensitivity={slug === "rav4" ? RAV4_VIEWER_SENSITIVITY : 1}
           ariaLabel={`360 degree view of the Toyota ${name} in ${selected.label}. Drag, or press the left and right arrow keys, to rotate.`}
         />
       </div>

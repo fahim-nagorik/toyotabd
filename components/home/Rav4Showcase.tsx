@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import {
   RAV4_COLORS,
   RAV4_HOTSPOTS,
+  RAV4_VIEWER_SENSITIVITY,
   RAV4_SPECS,
   rav4Frames,
   type Rav4ColorKey,
@@ -63,6 +64,7 @@ export default function Rav4Showcase() {
             <Viewer360
               frames={frames}
               hotspots={RAV4_HOTSPOTS}
+          sensitivity={RAV4_VIEWER_SENSITIVITY}
               ariaLabel={`360 degree view of the Toyota RAV4 in ${selected.label}. Drag, or press the left and right arrow keys, to rotate.`}
             />
           </div>

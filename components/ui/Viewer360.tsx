@@ -34,12 +34,16 @@ interface Viewer360Props {
   fallbackSrc?: string;
   ariaLabel?: string;
   className?: string;
+  /**
+   * Drag distance multiplier. 1 = full viewer-width drag is one full
+   * rotation (right for a real 36-frame set). Raise it for coarse interim
+   * sets so a short drag still visibly changes the view.
+   */
+  sensitivity?: number;
 }
 
 const INERTIA_DECAY = 0.94;
 const INERTIA_STOP = 0.02; // frames per tick
-const IDLE_DELAY_MS = 3000;
-const AUTOSPIN_SPEED = 0.045; // frames per tick ≈ one rotation / 13s
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
@@ -50,6 +54,7 @@ export default function Viewer360({
   fallbackSrc,
   ariaLabel = "360 degree view of the vehicle. Drag, or press the left and right arrow keys, to rotate.",
   className,
+  sensitivity = 1,
 }: Viewer360Props) {
   const n = frames.length;
 
@@ -62,7 +67,6 @@ export default function Viewer360({
   const draggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, pos: 0 });
   const lastMoveRef = useRef({ t: 0, pos: 0 });
-  const lastInteractionRef = useRef(0);
 
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
@@ -72,6 +76,7 @@ export default function Viewer360({
   const [dragging, setDragging] = useState(false);
   const [openHotspot, setOpenHotspot] = useState<string | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [interacted, setInteracted] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -152,25 +157,19 @@ export default function Viewer360({
     return () => ro.disconnect();
   }, [draw]);
 
-  // Single rAF loop: inertia, idle autospin, render.
+  // Single rAF loop: drag inertia + render.
   useEffect(() => {
     if (status !== "ready") return;
     let raf = 0;
     const tick = () => {
-      const now = performance.now();
+      // Manual rotation only — the viewer never moves on its own; drag
+      // inertia is the single non-interactive motion.
       if (!draggingRef.current) {
         if (Math.abs(velRef.current) > INERTIA_STOP) {
           posRef.current += velRef.current;
           velRef.current *= INERTIA_DECAY;
-          lastInteractionRef.current = now;
         } else {
           velRef.current = 0;
-          if (
-            !reducedMotion &&
-            now - lastInteractionRef.current > IDLE_DELAY_MS
-          ) {
-            posRef.current += AUTOSPIN_SPEED;
-          }
         }
       }
       draw();
@@ -178,28 +177,28 @@ export default function Viewer360({
       setFrame((prev) => (prev === current ? prev : current));
       raf = requestAnimationFrame(tick);
     };
-    lastInteractionRef.current = performance.now();
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [status, reducedMotion, draw, n]);
+  }, [status, draw, n]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (status !== "ready") return;
     e.currentTarget.setPointerCapture(e.pointerId);
     draggingRef.current = true;
     setDragging(true);
+    setInteracted(true);
     setOpenHotspot(null);
     velRef.current = 0;
     dragStartRef.current = { x: e.clientX, pos: posRef.current };
     lastMoveRef.current = { t: performance.now(), pos: posRef.current };
-    lastInteractionRef.current = performance.now();
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!draggingRef.current) return;
     const width = containerRef.current?.clientWidth ?? 1;
-    // Full-width drag = one full rotation: dx / (viewerWidth / frameCount).
-    const dx = e.clientX - dragStartRef.current.x;
+    // Full-width drag = one full rotation: dx / (viewerWidth / frameCount),
+    // scaled by `sensitivity` for coarse interim frame sets.
+    const dx = (e.clientX - dragStartRef.current.x) * sensitivity;
     const next = dragStartRef.current.pos - dx / (width / n);
 
     const now = performance.now();
@@ -210,7 +209,6 @@ export default function Viewer360({
     }
     lastMoveRef.current = { t: now, pos: next };
     posRef.current = next;
-    lastInteractionRef.current = now;
   };
 
   const onPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -218,7 +216,6 @@ export default function Viewer360({
     e.currentTarget.releasePointerCapture(e.pointerId);
     draggingRef.current = false;
     setDragging(false);
-    lastInteractionRef.current = performance.now();
     if (reducedMotion) velRef.current = 0; // no inertia spin
   };
 
@@ -226,10 +223,10 @@ export default function Viewer360({
     if (status !== "ready") return;
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     e.preventDefault();
+    setInteracted(true);
     velRef.current = 0;
     posRef.current =
       Math.round(posRef.current) + (e.key === "ArrowRight" ? 1 : -1);
-    lastInteractionRef.current = performance.now();
   };
 
   const visibleHotspots = useMemo(() => {
@@ -281,6 +278,28 @@ export default function Viewer360({
         )}
         style={{ touchAction: "none" }}
       />
+
+      {/* Discoverability hint — disappears after the first interaction. */}
+      {status === "ready" && !interacted && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
+          <span className="flex items-center gap-2 rounded-full border border-grey/60 bg-white/85 px-4 py-2 text-xs font-medium text-dark-grey shadow-sm backdrop-blur-sm">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-4"
+              aria-hidden
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7" />
+              <path d="M3 4v4h4" />
+            </svg>
+            Drag to rotate — 360°
+          </span>
+        </div>
+      )}
 
       {visibleHotspots.map((h) => (
         <div

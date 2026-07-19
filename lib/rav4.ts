@@ -23,6 +23,11 @@ export const RAV4_COLORS: {
   { key: "black", label: "Attitude Black", swatch: "#101010" },
 ];
 
+// Interim 4-view set: a full-width drag normally equals one rotation, which
+// feels unresponsive with only 4 distinct views — so drags count triple.
+// Set back to 1 when the full 36-frame sequence lands.
+export const RAV4_VIEWER_SENSITIVITY = 3;
+
 // Ranges/positions match the interim 4-view set (front 3/4 = frames 1-9,
 // rear 3/4 = 28-36). Retune both when the full 36-frame sequence lands
 // (canonical spec: frame 001 = straight-on front, clockwise from above).
