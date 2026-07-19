@@ -36,6 +36,13 @@
   --color-muted: var(--muted);
   --color-toyota-red-text: var(--toyota-red-text);
   --font-sans: var(--font-toyota);
+
+  /* Premium layered elevation (soft ambient + directional) */
+  --shadow-premium: 0 1px 2px rgb(16 16 16 / 0.04), 0 8px 24px rgb(16 16 16 / 0.06);
+  --shadow-premium-lg: 0 2px 4px rgb(16 16 16 / 0.05), 0 24px 48px rgb(16 16 16 / 0.1);
+
+  /* Brand easing — same curve as the §6 motion rules */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Light theme only — white dominant (§0) */
@@ -43,6 +50,35 @@ body {
   background: var(--white);
   color: var(--black);
   font-family: var(--font-toyota);
+}
+
+/* Tailwind v4 preflight leaves buttons at cursor:default — restore the
+   web-standard pointer affordance on everything clickable. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* Consistent brand focus ring for keyboard users. Zero-specificity :where()
+   lets per-component focus-visible utilities override it. */
+:where(a, button, [role="slider"], [role="tab"], [role="radio"]):focus-visible {
+  outline: 2px solid var(--toyota-red);
+  outline-offset: 2px;
+}
+
+/* Invisible 44×44 minimum hit area for visually small controls
+   (WCAG 2.5.8 target size). */
+.hit-44 {
+  position: relative;
+}
+.hit-44::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 /* Belt-and-braces alongside the per-component JS guards (§6): flatten all

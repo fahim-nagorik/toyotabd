@@ -57,7 +57,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
                 type="button"
                 aria-label="Close"
                 onClick={onClose}
-                className="flex size-9 shrink-0 items-center justify-center rounded-full text-mid-grey transition-colors duration-200 hover:bg-off-white hover:text-black"
+                className="hit-44 flex size-9 shrink-0 items-center justify-center rounded-full text-mid-grey transition-colors duration-200 hover:bg-off-white hover:text-black"
               >
                 <X className="size-5" />
               </button>

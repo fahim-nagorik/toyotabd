@@ -25,6 +25,20 @@ export default function ServicePage() {
             Keep your Toyota a Toyota — genuine parts shipped nationwide, and
             workshop slots you can book in under a minute.
           </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#parts"
+              className="rounded-full border border-grey bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors duration-200 hover:border-black"
+            >
+              Shop Genuine Parts
+            </a>
+            <a
+              href="#book"
+              className="rounded-full border border-grey bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors duration-200 hover:border-black"
+            >
+              Book a Service
+            </a>
+          </div>
         </div>
       </section>
 

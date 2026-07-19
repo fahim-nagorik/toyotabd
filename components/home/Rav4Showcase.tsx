@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Viewer360 from "@/components/ui/Viewer360";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import {
@@ -22,20 +23,13 @@ export default function Rav4Showcase() {
 
   return (
     <Section id="rav4" bleed className="scroll-mt-16 bg-off-white">
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-6 py-24 lg:grid-cols-[2fr_3fr]">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-6 py-24 md:py-32 lg:grid-cols-[2fr_3fr]">
         <div>
-          <Reveal>
-            <p className="text-xs uppercase tracking-[0.2em] text-toyota-red-text">
-              RAV4 Hybrid
-            </p>
-            <h2 className="mt-3 text-3xl font-light tracking-tight text-black md:text-5xl">
-              See it from every angle.
-            </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
-              Drag to walk around the RAV4 Hybrid. Pick a finish below the
-              viewer — hotspots reveal the details worth a closer look.
-            </p>
-          </Reveal>
+          <SectionHeader
+            kicker="RAV4 Hybrid"
+            title="See it from every angle."
+            sub="Drag to walk around the RAV4 Hybrid. Pick a finish below the viewer — hotspots reveal the details worth a closer look."
+          />
 
           <Reveal delay={0.08}>
             <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-grey/60 pt-8">
@@ -84,7 +78,7 @@ export default function Rav4Showcase() {
                   title={c.label}
                   onClick={() => setColor(c.key)}
                   className={clsx(
-                    "size-8 rounded-full border border-grey transition-shadow duration-200",
+                    "hit-44 size-8 rounded-full border border-grey transition-shadow duration-200",
                     color === c.key &&
                       "ring-2 ring-black ring-offset-2 ring-offset-off-white",
                   )}

@@ -77,6 +77,15 @@ export default function Viewer360({
   const [openHotspot, setOpenHotspot] = useState<string | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [interacted, setInteracted] = useState(false);
+  const [coarsePointer, setCoarsePointer] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    const update = () => setCoarsePointer(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -296,7 +305,7 @@ export default function Viewer360({
               <path d="M3 12a9 9 0 1 0 3-6.7" />
               <path d="M3 4v4h4" />
             </svg>
-            Drag to rotate — 360°
+            {coarsePointer ? "Swipe" : "Drag"} to rotate — 360°
           </span>
         </div>
       )}
@@ -314,7 +323,7 @@ export default function Viewer360({
             onClick={() =>
               setOpenHotspot((cur) => (cur === h.id ? null : h.id))
             }
-            className="flex size-8 items-center justify-center rounded-full border border-grey bg-white/90 text-dark-grey shadow-sm transition-transform duration-200 hover:scale-110"
+            className="hit-44 flex size-8 items-center justify-center rounded-full border border-grey bg-white/90 text-dark-grey shadow-sm transition-transform duration-200 hover:scale-110"
           >
             <Plus className="size-4" />
           </button>
@@ -326,7 +335,7 @@ export default function Viewer360({
                   type="button"
                   aria-label="Close"
                   onClick={() => setOpenHotspot(null)}
-                  className="text-muted hover:text-black"
+                  className="hit-44 text-muted hover:text-black"
                 >
                   <X className="size-4" />
                 </button>

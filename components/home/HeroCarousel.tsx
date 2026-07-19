@@ -185,28 +185,32 @@ export default function HeroCarousel() {
         <ChevronRight className="size-5" />
       </button>
 
-      {/* Dots */}
-      <div
-        role="tablist"
-        aria-label="Slides"
-        className="absolute inset-x-0 bottom-10 z-10 flex justify-center gap-2"
-      >
-        {SLIDES.map((s, i) => (
-          <button
-            key={s.id}
-            type="button"
-            role="tab"
-            aria-selected={i === index}
-            aria-label={`Go to slide ${i + 1}: ${s.name}`}
-            onClick={() => goTo(i)}
-            className={clsx(
-              "h-2 rounded-full transition-all duration-300",
-              i === index
-                ? "w-8 bg-toyota-red"
-                : "w-2 bg-grey hover:bg-dark-grey",
-            )}
-          />
-        ))}
+      {/* Dots — 44px-tall touch targets with the dot as an inner visual.
+          Autoplay always on (client request); hover/focus still pause it and
+          reduced-motion disables it entirely. */}
+      <div className="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center">
+        <div role="tablist" aria-label="Slides" className="flex items-center gap-1">
+          {SLIDES.map((s, i) => (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`Go to slide ${i + 1}: ${s.name}`}
+              onClick={() => goTo(i)}
+              className="group flex h-11 items-center px-1.5"
+            >
+              <span
+                className={clsx(
+                  "block h-2 rounded-full transition-all duration-300",
+                  i === index
+                    ? "w-8 bg-toyota-red"
+                    : "w-2 bg-grey group-hover:bg-dark-grey",
+                )}
+              />
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );

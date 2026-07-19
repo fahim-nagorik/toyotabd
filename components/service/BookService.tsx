@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { CalendarPlus, Check } from "lucide-react";
+import { CalendarPlus, Check, Loader2 } from "lucide-react";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { VEHICLES } from "@/lib/vehicles";
@@ -87,6 +88,7 @@ export default function BookService() {
   const [direction, setDirection] = useState(1);
   const [booking, setBooking] = useState<Booking>(EMPTY);
   const [error, setError] = useState("");
+  const [confirming, setConfirming] = useState(false);
   const [reference, setReference] = useState("");
 
   // Next 14 days — only rendered on step 3, which is reached client-side.
@@ -153,7 +155,13 @@ export default function BookService() {
       setError(err);
       return;
     }
-    setReference(`TSB-${Date.now().toString(36).toUpperCase()}`);
+    if (confirming) return;
+    // Loading -> success feedback (no real network in the demo).
+    setConfirming(true);
+    window.setTimeout(
+      () => setReference(`TSB-${Date.now().toString(36).toUpperCase()}`),
+      700,
+    );
   };
 
   const inputClasses =
@@ -203,33 +211,50 @@ export default function BookService() {
 
   return (
     <Section id="book" bleed className="scroll-mt-16 bg-off-white">
-      <div className="mx-auto w-full max-w-3xl px-6 py-24">
-        <Reveal>
-          <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-            Book a Service.
-          </h2>
-        </Reveal>
+      <div className="mx-auto w-full max-w-3xl px-6 py-24 md:py-32">
+        <SectionHeader
+          kicker="Aftersales"
+          title="Book a Service."
+          sub="Four steps, about two minutes — pick a slot that suits you."
+        />
 
         {/* Progress bar */}
         <Reveal delay={0.08}>
           <ol className="mt-10 flex gap-2" aria-label="Booking progress">
             {STEPS.map((s, i) => (
               <li key={s} className="flex-1">
-                <div
-                  className={clsx(
-                    "h-1 rounded-full transition-colors duration-300",
-                    i <= step ? "bg-toyota-red" : "bg-grey/60",
-                  )}
-                />
-                <span
-                  className={clsx(
-                    "mt-2 block text-xs",
-                    i === step ? "text-black" : "text-muted",
-                  )}
+                {/* Completed steps are clickable to jump back (state kept). */}
+                <button
+                  type="button"
+                  disabled={i >= step}
+                  onClick={() => {
+                    setError("");
+                    setDirection(-1);
+                    setStep(i);
+                  }}
                   aria-current={i === step ? "step" : undefined}
+                  aria-label={`Step ${i + 1}: ${s}${i < step ? " (completed, go back)" : ""}`}
+                  className={clsx(
+                    "block w-full text-left",
+                    i >= step && "cursor-default",
+                  )}
                 >
-                  {i + 1}. {s}
-                </span>
+                  <span
+                    className={clsx(
+                      "block h-1 rounded-full transition-colors duration-300",
+                      i <= step ? "bg-toyota-red" : "bg-grey/60",
+                    )}
+                  />
+                  <span
+                    className={clsx(
+                      "mt-2 block text-xs",
+                      i === step ? "text-black" : "text-muted",
+                      i < step && "hover:text-black",
+                    )}
+                  >
+                    {i + 1}. {s}
+                  </span>
+                </button>
               </li>
             ))}
           </ol>
@@ -365,7 +390,7 @@ export default function BookService() {
                               : "border-grey bg-white text-dark-grey hover:border-black",
                           )}
                         >
-                          <span className="block text-[10px] uppercase opacity-70">
+                          <span className="block text-xs uppercase opacity-70">
                             {d.dow}
                           </span>
                           <span className="mt-0.5 block text-sm">{d.label}</span>
@@ -393,7 +418,7 @@ export default function BookService() {
                               onClick={() => set("slot")(slot)}
                               aria-pressed={booking.slot === slot}
                               className={clsx(
-                                "rounded-full border px-5 py-2 text-sm transition-colors duration-200",
+                                "rounded-full border px-5 py-2.5 text-sm transition-colors duration-200",
                                 booked &&
                                   "cursor-not-allowed border-light-grey bg-light-grey text-muted line-through",
                                 !booked &&
@@ -482,7 +507,15 @@ export default function BookService() {
           {step < 3 ? (
             <Button onClick={() => go(1)}>Continue</Button>
           ) : (
-            <Button onClick={submit}>Confirm Booking</Button>
+            <Button onClick={submit} disabled={confirming}>
+              {confirming ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" /> Confirming…
+                </>
+              ) : (
+                "Confirm Booking"
+              )}
+            </Button>
           )}
         </div>
       </div>

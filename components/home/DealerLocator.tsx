@@ -4,6 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { MapPin, Phone, Clock, Search } from "lucide-react";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import { DEALERS } from "@/lib/dealers";
 
@@ -21,12 +22,12 @@ export default function DealerLocator() {
   );
 
   return (
-    <Section id="dealers" className="scroll-mt-16 py-24">
-      <Reveal>
-        <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-          Find your dealer.
-        </h2>
-      </Reveal>
+    <Section id="dealers" className="scroll-mt-16 py-24 md:py-32">
+      <SectionHeader
+        kicker="Dealers"
+        title="Find your dealer."
+        sub="Six authorised dealers across Bangladesh, from Dhaka to Sylhet."
+      />
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[2fr_3fr]">
         <Reveal>

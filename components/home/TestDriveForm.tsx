@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { VEHICLES } from "@/lib/vehicles";
 import { DEALERS } from "@/lib/dealers";
@@ -42,6 +42,7 @@ export default function TestDriveForm({
     model: defaultModel ?? "",
   });
   const [errors, setErrors] = useState<Partial<Fields>>({});
+  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
   const set = (key: keyof Fields) => (value: string) => {
@@ -49,16 +50,37 @@ export default function TestDriveForm({
     setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
+  const validateField = (key: keyof Fields, value: string): string | undefined => {
+    switch (key) {
+      case "name":
+        return value.trim() ? undefined : "Please enter your name.";
+      case "phone":
+        return /^\+?[\d\s-]{10,}$/.test(value)
+          ? undefined
+          : "Please enter a valid phone number.";
+      case "email":
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+          ? undefined
+          : "Please enter a valid email address.";
+      case "model":
+        return value ? undefined : "Please choose a model.";
+      case "dealer":
+        return value ? undefined : "Please choose a dealer.";
+      case "date":
+        return value ? undefined : "Please pick a date.";
+    }
+  };
+
+  // Inline validation on blur; the full check still runs on submit.
+  const blur = (key: keyof Fields) => () =>
+    setErrors((e) => ({ ...e, [key]: validateField(key, fields[key]) }));
+
   const validate = (): boolean => {
     const next: Partial<Fields> = {};
-    if (!fields.name.trim()) next.name = "Please enter your name.";
-    if (!/^\+?[\d\s-]{10,}$/.test(fields.phone))
-      next.phone = "Please enter a valid phone number.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email))
-      next.email = "Please enter a valid email address.";
-    if (!fields.model) next.model = "Please choose a model.";
-    if (!fields.dealer) next.dealer = "Please choose a dealer.";
-    if (!fields.date) next.date = "Please pick a date.";
+    (Object.keys(fields) as (keyof Fields)[]).forEach((key) => {
+      const err = validateField(key, fields[key]);
+      if (err) next[key] = err;
+    });
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -111,7 +133,10 @@ export default function TestDriveForm({
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        if (validate()) setDone(true);
+        if (!validate() || submitting) return;
+        // Loading -> success feedback (no real network in the demo).
+        setSubmitting(true);
+        window.setTimeout(() => setDone(true), 700);
       }}
       className={clsx("grid gap-5", !compact && "sm:grid-cols-2")}
     >
@@ -123,6 +148,7 @@ export default function TestDriveForm({
           type="text"
           value={fields.name}
           onChange={(e) => set("name")(e.target.value)}
+          onBlur={blur("name")}
           placeholder="Your full name"
           className={inputClasses(errors.name)}
         />,
@@ -135,6 +161,7 @@ export default function TestDriveForm({
           type="tel"
           value={fields.phone}
           onChange={(e) => set("phone")(e.target.value)}
+          onBlur={blur("phone")}
           placeholder="+880 1X XXXX XXXX"
           className={inputClasses(errors.phone)}
         />,
@@ -147,6 +174,7 @@ export default function TestDriveForm({
           type="email"
           value={fields.email}
           onChange={(e) => set("email")(e.target.value)}
+          onBlur={blur("email")}
           placeholder="you@example.com"
           className={inputClasses(errors.email)}
         />,
@@ -158,6 +186,7 @@ export default function TestDriveForm({
           id="td-model"
           value={fields.model}
           onChange={(e) => set("model")(e.target.value)}
+          onBlur={blur("model")}
           className={inputClasses(errors.model)}
         >
           <option value="">Choose a model</option>
@@ -175,6 +204,7 @@ export default function TestDriveForm({
           id="td-dealer"
           value={fields.dealer}
           onChange={(e) => set("dealer")(e.target.value)}
+          onBlur={blur("dealer")}
           className={inputClasses(errors.dealer)}
         >
           <option value="">Choose a dealer</option>
@@ -193,12 +223,19 @@ export default function TestDriveForm({
           type="date"
           value={fields.date}
           onChange={(e) => set("date")(e.target.value)}
+          onBlur={blur("date")}
           className={inputClasses(errors.date)}
         />,
       )}
       <div className={clsx(!compact && "sm:col-span-2", "mt-1")}>
-        <Button type="submit" className="w-full sm:w-auto">
-          Request Test Drive
+        <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 size-4 animate-spin" /> Sending…
+            </>
+          ) : (
+            "Request Test Drive"
+          )}
         </Button>
       </div>
     </form>

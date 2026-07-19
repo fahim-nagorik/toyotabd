@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, Minus, Plus, Trash2, X } from "lucide-react";
+import { Check, Loader2, Minus, Plus, Trash2, X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/components/service/CartContext";
 import { partBySlug } from "@/lib/parts";
@@ -37,6 +37,7 @@ export default function CartDrawer() {
   const cart = useCart();
   const reduced = useReducedMotion();
   const [stage, setStage] = useState<Stage>("cart");
+  const [placing, setPlacing] = useState(false);
   const [orderNo, setOrderNo] = useState("");
   const [fields, setFields] = useState<CheckoutFields>({
     name: "",
@@ -46,12 +47,14 @@ export default function CartDrawer() {
     payment: "bKash",
   });
   const [errors, setErrors] = useState<Partial<CheckoutFields>>({});
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!cart.drawerOpen) return;
     const onKey = (e: KeyboardEvent) =>
       e.key === "Escape" && cart.closeDrawer();
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
@@ -64,17 +67,46 @@ export default function CartDrawer() {
     setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
+  const validateField = (
+    key: keyof CheckoutFields,
+    value: string,
+  ): string | undefined => {
+    switch (key) {
+      case "name":
+        return value.trim() ? undefined : "Required";
+      case "phone":
+        return /^\+?[\d\s-]{10,}$/.test(value)
+          ? undefined
+          : "Valid phone required";
+      case "address":
+        return value.trim() ? undefined : "Required";
+      case "division":
+        return value ? undefined : "Required";
+      default:
+        return undefined;
+    }
+  };
+
+  // Inline validation on blur; the full check still runs on submit.
+  const blur = (key: keyof CheckoutFields) => () =>
+    setErrors((e) => ({ ...e, [key]: validateField(key, fields[key]) }));
+
   const placeOrder = () => {
     const next: Partial<CheckoutFields> = {};
-    if (!fields.name.trim()) next.name = "Required";
-    if (!/^\+?[\d\s-]{10,}$/.test(fields.phone)) next.phone = "Valid phone required";
-    if (!fields.address.trim()) next.address = "Required";
-    if (!fields.division) next.division = "Required";
+    (["name", "phone", "address", "division"] as const).forEach((key) => {
+      const err = validateField(key, fields[key]);
+      if (err) next[key] = err;
+    });
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
-    setOrderNo(`TBD-${Date.now().toString(36).toUpperCase()}`);
-    cart.clear();
-    setStage("done");
+    if (Object.keys(next).length > 0 || placing) return;
+    // Loading -> success feedback (no real network in the demo).
+    setPlacing(true);
+    window.setTimeout(() => {
+      setOrderNo(`TBD-${Date.now().toString(36).toUpperCase()}`);
+      cart.clear();
+      setStage("done");
+      setPlacing(false);
+    }, 700);
   };
 
   const inputClasses = (error?: string) =>
@@ -119,10 +151,11 @@ export default function CartDrawer() {
                 {stage === "done" && "Order Confirmed"}
               </h2>
               <button
+                ref={closeRef}
                 type="button"
                 aria-label="Close cart"
                 onClick={cart.closeDrawer}
-                className="flex size-9 items-center justify-center rounded-full text-muted transition-colors duration-200 hover:bg-off-white hover:text-black"
+                className="hit-44 flex size-9 items-center justify-center rounded-full text-muted transition-colors duration-200 hover:bg-off-white hover:text-black"
               >
                 <X className="size-5" />
               </button>
@@ -165,7 +198,7 @@ export default function CartDrawer() {
                                     onClick={() =>
                                       cart.setQty(line.slug, line.qty - 1)
                                     }
-                                    className="flex size-8 items-center justify-center text-dark-grey hover:text-black"
+                                    className="hit-44 flex size-8 items-center justify-center text-dark-grey hover:text-black"
                                   >
                                     <Minus className="size-3.5" />
                                   </button>
@@ -178,16 +211,19 @@ export default function CartDrawer() {
                                     onClick={() =>
                                       cart.setQty(line.slug, line.qty + 1)
                                     }
-                                    className="flex size-8 items-center justify-center text-dark-grey hover:text-black"
+                                    className="hit-44 flex size-8 items-center justify-center text-dark-grey hover:text-black"
                                   >
                                     <Plus className="size-3.5" />
                                   </button>
                                 </div>
+                                <span className="text-sm font-medium text-black">
+                                  {taka(part.price * line.qty)}
+                                </span>
                                 <button
                                   type="button"
                                   aria-label={`Remove ${part.name}`}
                                   onClick={() => cart.remove(line.slug)}
-                                  className="text-muted transition-colors duration-200 hover:text-toyota-red"
+                                  className="hit-44 text-muted transition-colors duration-200 hover:text-toyota-red"
                                 >
                                   <Trash2 className="size-4" />
                                 </button>
@@ -260,6 +296,7 @@ export default function CartDrawer() {
                         type={type}
                         value={fields[key]}
                         onChange={(e) => set(key)(e.target.value)}
+                        onBlur={blur(key)}
                         placeholder={placeholder}
                         className={inputClasses(errors[key])}
                       />
@@ -282,6 +319,7 @@ export default function CartDrawer() {
                       id="co-division"
                       value={fields.division}
                       onChange={(e) => set("division")(e.target.value)}
+                      onBlur={blur("division")}
                       className={inputClasses(errors.division)}
                     >
                       <option value="">Choose a division</option>
@@ -332,8 +370,15 @@ export default function CartDrawer() {
                     <span>{taka(cart.total)}</span>
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Place Order — {taka(cart.total)}
+                  <Button type="submit" disabled={placing} className="w-full">
+                    {placing ? (
+                      <>
+                        <Loader2 className="mr-2 size-4 animate-spin" /> Placing
+                        order…
+                      </>
+                    ) : (
+                      <>Place Order — {taka(cart.total)}</>
+                    )}
                   </Button>
                   <button
                     type="button"

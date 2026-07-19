@@ -56,7 +56,7 @@ export default async function ModelPage({ params }: PageProps) {
   const others = VEHICLES.filter((v) => v.slug !== slug).slice(0, 3);
 
   return (
-    <main className="pt-16">
+    <main className="pb-20 pt-16 lg:pb-0">
       {/* Hero band */}
       <section className="bg-off-white">
         <div className="mx-auto w-full max-w-7xl px-6 pb-14 pt-16">
@@ -143,7 +143,7 @@ export default async function ModelPage({ params }: PageProps) {
       </Section>
 
       {/* Test drive, pre-filled */}
-      <Section bleed className="bg-off-white">
+      <Section id="book-test-drive" bleed className="scroll-mt-16 bg-off-white">
         <div className="mx-auto w-full max-w-2xl px-6 py-16">
           <Reveal>
             <h2 className="text-center text-2xl font-light tracking-tight text-black md:text-4xl">
@@ -175,14 +175,14 @@ export default async function ModelPage({ params }: PageProps) {
                 href={`/models/${v.slug}`}
                 className="group block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toyota-red"
               >
-                <div className="overflow-hidden rounded-2xl bg-off-white transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-black/10">
+                <div className="overflow-hidden rounded-2xl bg-off-white transition-[box-shadow,transform] duration-500 ease-premium group-hover:-translate-y-1 group-hover:shadow-premium-lg">
                   <Image
                     src={v.image}
                     alt={v.name}
                     width={1200}
                     height={675}
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="h-auto w-full transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+                    className="h-auto w-full transition-transform duration-500 ease-premium group-hover:scale-[1.03]"
                   />
                 </div>
                 <div className="px-1 pt-4">
@@ -196,6 +196,19 @@ export default async function ModelPage({ params }: PageProps) {
           ))}
         </div>
       </Section>
+
+      {/* Sticky conversion bar on mobile (primary CTA always reachable) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-4 border-t border-light-grey bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-black">
+            {vehicle.name}
+          </p>
+          <p className="text-xs text-muted">From {vehicle.priceFrom}</p>
+        </div>
+        <Button href="#book-test-drive" className="shrink-0 !px-5 !py-2.5">
+          Book a Test Drive
+        </Button>
+      </div>
     </main>
   );
 }

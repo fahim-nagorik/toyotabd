@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import clsx from "clsx";
 import { Menu, X } from "lucide-react";
@@ -21,6 +22,13 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
+  const pathname = usePathname();
+
+  // Active State (nav): highlight the section the visitor is in.
+  const isActive = (item: (typeof NAV)[number]) =>
+    item.href === "/service"
+      ? pathname.startsWith("/service")
+      : item.label === "Vehicles" && pathname.startsWith("/models");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -29,11 +37,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll while the mobile menu is open.
+  // Lock body scroll while the mobile menu is open; Esc closes it.
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    if (open) window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
@@ -62,7 +75,14 @@ export default function Header() {
             <Link
               key={item.label}
               href={item.href}
-              className="text-sm text-dark-grey transition-colors duration-200 hover:text-black"
+              aria-current={isActive(item) ? "page" : undefined}
+              className={clsx(
+                "relative text-sm transition-colors duration-200 hover:text-black",
+                "after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-full after:origin-left after:rounded-full after:bg-toyota-red after:transition-transform after:duration-300 after:ease-premium",
+                isActive(item)
+                  ? "font-medium text-black after:scale-x-100"
+                  : "text-dark-grey after:scale-x-0 hover:after:scale-x-100",
+              )}
             >
               {item.label}
             </Link>
@@ -78,7 +98,7 @@ export default function Header() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="flex size-10 items-center justify-center text-black lg:hidden"
+          className="flex size-11 items-center justify-center text-black lg:hidden"
         >
           {open ? <X className="size-6" /> : <Menu className="size-6" />}
         </button>

@@ -62,7 +62,7 @@ function CountUp({ value, suffix }: { value: number; suffix: string }) {
 export default function Safety() {
   return (
     <Section id="safety" bleed className="scroll-mt-16 bg-black text-white">
-      <div className="mx-auto w-full max-w-7xl px-6 py-24">
+      <div className="mx-auto w-full max-w-7xl px-6 py-24 md:py-32">
         <Reveal>
           <Image
             src="/brand/ToyotaProductLogo_Secondary_White_RGB.png"
@@ -70,9 +70,12 @@ export default function Safety() {
             width={124}
             height={41}
           />
-          <h2 className="mt-8 text-3xl font-light tracking-tight md:text-5xl">
+          <h2 className="mt-8 text-4xl font-light tracking-tight md:text-6xl">
             Engineered to protect.
           </h2>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-grey md:text-lg">
+            Toyota Safety Sense watches the road so you can watch the moment.
+          </p>
         </Reveal>
 
         <div className="mt-14 grid grid-cols-1 gap-10 border-t border-dark-grey pt-12 sm:grid-cols-3">

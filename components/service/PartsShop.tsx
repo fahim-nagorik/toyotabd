@@ -5,6 +5,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -28,16 +29,13 @@ export default function PartsShop() {
   };
 
   return (
-    <Section id="parts" className="scroll-mt-16 py-24">
+    <Section id="parts" className="scroll-mt-16 py-24 md:py-32">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <Reveal>
-          <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-            Parts &amp; Oil Shop
-          </h2>
-          <p className="mt-3 max-w-xl text-base text-muted">
-            Genuine Toyota parts, delivered anywhere in Bangladesh.
-          </p>
-        </Reveal>
+        <SectionHeader
+          kicker="Genuine Parts"
+          title="Parts &amp; Oil Shop."
+          sub="Genuine Toyota parts, delivered anywhere in Bangladesh."
+        />
         <Reveal delay={0.08}>
           <button
             type="button"
@@ -85,7 +83,7 @@ export default function PartsShop() {
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {visible.map((p, i) => (
           <Reveal key={p.slug} delay={(i % 4) * 0.08}>
-            <article className="group flex h-full flex-col rounded-2xl border border-light-grey bg-white p-4 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/5">
+            <article className="group flex h-full flex-col rounded-2xl border border-light-grey bg-white p-4 transition-[box-shadow,transform] duration-500 ease-premium hover:-translate-y-1 hover:shadow-premium-lg">
               <button
                 type="button"
                 onClick={() => openDetail(p)}
@@ -172,7 +170,7 @@ export default function PartsShop() {
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setDetailQty((q) => Math.max(1, q - 1))}
-                  className="flex size-10 items-center justify-center text-dark-grey hover:text-black"
+                  className="hit-44 flex size-10 items-center justify-center text-dark-grey hover:text-black"
                 >
                   <Minus className="size-4" />
                 </button>
@@ -183,7 +181,7 @@ export default function PartsShop() {
                   type="button"
                   aria-label="Increase quantity"
                   onClick={() => setDetailQty((q) => q + 1)}
-                  className="flex size-10 items-center justify-center text-dark-grey hover:text-black"
+                  className="hit-44 flex size-10 items-center justify-center text-dark-grey hover:text-black"
                 >
                   <Plus className="size-4" />
                 </button>

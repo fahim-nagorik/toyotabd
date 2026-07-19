@@ -83,12 +83,17 @@ export default function Footer() {
               <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link
-                      href={l.href}
-                      className="text-sm text-grey transition-colors duration-200 hover:text-white"
-                    >
-                      {l.label}
-                    </Link>
+                    {l.href === "#" ? (
+                      // Placeholder destinations render as text, not fake links.
+                      <span className="text-sm text-grey/70">{l.label}</span>
+                    ) : (
+                      <Link
+                        href={l.href}
+                        className="text-sm text-grey transition-colors duration-200 hover:text-white"
+                      >
+                        {l.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -98,13 +103,13 @@ export default function Footer() {
             <h3 className="text-xs uppercase tracking-[0.2em] text-mid-grey">
               Connect
             </h3>
-            <div className="mt-4 flex gap-4">
+            <div className="mt-2 -ml-3 flex gap-1">
               {SOCIALS.map(({ label, paths }) => (
                 <Link
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="text-grey transition-colors duration-200 hover:text-white"
+                  className="inline-flex size-11 items-center justify-center rounded-full text-grey transition-colors duration-200 hover:text-white"
                 >
                   <SocialIcon paths={paths} />
                 </Link>

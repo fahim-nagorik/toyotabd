@@ -50,7 +50,7 @@ export default function ViewerTestPage() {
               title={c.label}
               onClick={() => setColor(c.key)}
               className={clsx(
-                "size-9 rounded-full border border-grey transition-shadow duration-200",
+                "hit-44 size-9 rounded-full border border-grey transition-shadow duration-200",
                 color === c.key &&
                   "ring-2 ring-black ring-offset-2 ring-offset-white",
               )}

@@ -34,9 +34,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${toyotaType.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-black focus:px-5 focus:py-2.5 focus:text-sm focus:text-white"
+        >
+          Skip to content
+        </a>
         <LenisProvider />
         <Header />
-        <div className="flex-1">{children}</div>
+        <div id="content" className="flex-1">
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

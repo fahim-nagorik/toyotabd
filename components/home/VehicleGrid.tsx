@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import { VEHICLES, VEHICLE_FILTERS } from "@/lib/vehicles";
 
@@ -17,12 +18,12 @@ export default function VehicleGrid() {
   );
 
   return (
-    <Section id="vehicles" className="scroll-mt-16 py-24">
-      <Reveal>
-        <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-          The Lineup
-        </h2>
-      </Reveal>
+    <Section id="vehicles" className="scroll-mt-16 py-24 md:py-32">
+      <SectionHeader
+        kicker="Vehicles"
+        title="The Lineup."
+        sub="Eight models — from city hybrids to the flagship Land Cruiser."
+      />
 
       <Reveal delay={0.08}>
         <div
@@ -59,14 +60,14 @@ export default function VehicleGrid() {
                 aria-label={`View ${v.name} details`}
                 className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toyota-red"
               >
-                <div className="overflow-hidden rounded-2xl bg-off-white shadow-transparent transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-black/10">
+                <div className="overflow-hidden rounded-2xl bg-off-white transition-[box-shadow,transform] duration-500 ease-premium group-hover:-translate-y-1 group-hover:shadow-premium-lg">
                   <Image
                     src={v.image}
                     alt={v.name}
                     width={1200}
                     height={675}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="h-auto w-full transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+                    className="h-auto w-full transition-transform duration-500 ease-premium group-hover:scale-[1.03]"
                   />
                 </div>
                 <div className="px-1 pb-2 pt-5">

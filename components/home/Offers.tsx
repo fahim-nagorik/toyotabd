@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -14,12 +15,12 @@ export default function Offers() {
 
   return (
     <Section id="offers" bleed className="scroll-mt-16 bg-off-white">
-      <div className="mx-auto w-full max-w-7xl px-6 py-24">
-        <Reveal>
-          <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-            Current offers.
-          </h2>
-        </Reveal>
+      <div className="mx-auto w-full max-w-7xl px-6 py-24 md:pt-32">
+        <SectionHeader
+          kicker="Offers"
+          title="Current offers."
+          sub="Limited-time offers across the range — enquire in one tap."
+        />
       </div>
 
       <Reveal>
@@ -29,7 +30,7 @@ export default function Offers() {
           {OFFERS.map((o) => (
             <article
               key={o.id}
-              className="w-[85vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-2xl bg-white"
+              className="w-[85vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-2xl bg-white shadow-premium"
             >
               <div className="bg-off-white">
                 <Image

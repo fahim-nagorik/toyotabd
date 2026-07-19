@@ -1,6 +1,7 @@
 import Image from "next/image";
 import clsx from "clsx";
 import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
 import Reveal from "@/components/ui/Reveal";
 
 const PANELS = [
@@ -29,12 +30,12 @@ const PANELS = [
 
 export default function Technology() {
   return (
-    <Section id="technology" className="scroll-mt-16 py-24">
-      <Reveal>
-        <h2 className="text-3xl font-light tracking-tight text-black md:text-5xl">
-          Technology that works for you.
-        </h2>
-      </Reveal>
+    <Section id="technology" className="scroll-mt-16 py-24 md:py-32">
+      <SectionHeader
+        kicker="Technology"
+        title="Technology that works for you."
+        sub="Hybrid power, active safety and connectivity — engineered in, not added on."
+      />
 
       <div className="mt-16 flex flex-col gap-24">
         {PANELS.map((p, i) => (
