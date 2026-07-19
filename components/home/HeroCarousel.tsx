@@ -11,42 +11,54 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const AUTOPLAY_MS = 6000;
 
 interface Slide {
+  id: string;
   slug: string;
   name: string;
+  kicker: string;
   headline: string;
   sub: string;
   image: string;
 }
 
-// Hero images follow the public/vehicles/{slug}-hero.webp contract.
+// Interim slide set: four RAV4 colorways (client renders) at
+// public/hero/rav4-{color}.webp. When per-model banner photography arrives,
+// switch back to one slide per model via public/vehicles/{slug}-hero.webp.
 const SLIDES: Slide[] = [
   {
+    id: "rav4-white",
     slug: "rav4",
     name: "RAV4 Hybrid",
+    kicker: "RAV4 Hybrid · Platinum White Pearl",
     headline: "RAV4 Hybrid.",
     sub: "Electrified capability, engineered for every road in Bangladesh.",
-    image: "/vehicles/rav4-hero.webp",
+    image: "/hero/rav4-white.webp",
   },
   {
-    slug: "land-cruiser",
-    name: "Land Cruiser 300",
-    headline: "Land Cruiser 300.",
-    sub: "The legend, engineered beyond limits.",
-    image: "/vehicles/land-cruiser-hero.webp",
+    id: "rav4-blue",
+    slug: "rav4",
+    name: "RAV4 Hybrid",
+    kicker: "RAV4 Hybrid · Dark Blue Mica",
+    headline: "Command every road.",
+    sub: "E-Four electric AWD with self-charging hybrid power.",
+    image: "/hero/rav4-blue.webp",
   },
   {
-    slug: "corolla-cross",
-    name: "Corolla Cross",
-    headline: "Corolla Cross.",
-    sub: "The self-charging hybrid SUV, built for the city.",
-    image: "/vehicles/corolla-cross-hero.webp",
+    id: "rav4-grey",
+    slug: "rav4",
+    name: "RAV4 Hybrid",
+    kicker: "RAV4 Hybrid · Grey Metallic",
+    headline: "Safety that never blinks.",
+    sub: "Toyota Safety Sense camera and radar, standard on every grade.",
+    image: "/hero/rav4-grey.webp",
   },
   {
-    slug: "camry",
-    name: "Camry HEV",
-    headline: "Camry HEV.",
-    sub: "Executive comfort with hybrid efficiency.",
-    image: "/vehicles/camry-hero.webp",
+    id: "rav4-silver",
+    slug: "rav4",
+    name: "RAV4 Hybrid",
+    kicker: "RAV4 Hybrid · Silver Metallic",
+    headline: "Take the wheel.",
+    sub: "Book a test drive at your nearest dealer in minutes.",
+    image: "/hero/rav4-silver.webp",
   },
 ];
 
@@ -99,7 +111,7 @@ export default function HeroCarousel() {
     >
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
-          key={slide.slug}
+          key={slide.id}
           role="group"
           aria-roledescription="slide"
           aria-label={`${index + 1} of ${SLIDES.length}: ${slide.name}`}
@@ -117,23 +129,27 @@ export default function HeroCarousel() {
           }}
           className="absolute inset-0"
         >
-          <Image
-            src={slide.image}
-            alt={slide.name}
-            fill
-            priority={index === 0}
-            sizes="100vw"
-            className="pointer-events-none select-none object-cover"
-          />
-          {/* Caption, container-aligned like the toyota-bd.com banner */}
-          <div className="absolute inset-x-0 bottom-0">
-            <div className="mx-auto w-full max-w-7xl px-6 pb-28">
+          {/* Split composition: caption left, contained render right — the
+              client renders center the car, so a full-bleed overlay would
+              put text on the bodywork. */}
+          <div className="mx-auto flex h-full w-full max-w-7xl flex-col px-6 pt-20 lg:flex-row lg:items-center lg:gap-10 lg:pt-16">
+            <div className="relative min-h-0 flex-1 lg:order-2 lg:self-stretch">
+              <Image
+                src={slide.image}
+                alt={slide.name}
+                fill
+                priority={index === 0}
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                className="pointer-events-none select-none object-contain"
+              />
+            </div>
+            <div className="shrink-0 pb-24 pt-4 lg:order-1 lg:w-[40%] lg:py-0">
               <p className="text-xs uppercase tracking-[0.2em] text-toyota-red-text">
-                {slide.name}
+                {slide.kicker}
               </p>
               <h1
                 className="mt-3 font-light leading-[1.05] tracking-tight text-black"
-                style={{ fontSize: "clamp(40px, 6vw, 84px)" }}
+                style={{ fontSize: "clamp(36px, 4.5vw, 72px)" }}
               >
                 {slide.headline}
               </h1>
@@ -177,7 +193,7 @@ export default function HeroCarousel() {
       >
         {SLIDES.map((s, i) => (
           <button
-            key={s.slug}
+            key={s.id}
             type="button"
             role="tab"
             aria-selected={i === index}

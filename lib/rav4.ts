@@ -23,22 +23,25 @@ export const RAV4_COLORS: {
   { key: "black", label: "Attitude Black", swatch: "#101010" },
 ];
 
+// Ranges/positions match the interim 4-view set (front 3/4 = frames 1-9,
+// rear 3/4 = 28-36). Retune both when the full 36-frame sequence lands
+// (canonical spec: frame 001 = straight-on front, clockwise from above).
 export const RAV4_HOTSPOTS: ViewerHotspot[] = [
   {
     id: "headlight",
     title: "LED Projector Headlamps",
     body: "Adaptive LED units with integrated daytime running lights and auto high beam.",
-    x: 0.68,
-    y: 0.42,
-    frames: [30, 6],
+    x: 0.37,
+    y: 0.47,
+    frames: [1, 9],
   },
   {
     id: "tailgate",
     title: "Power Back Door",
     body: "Hands-free power tailgate with kick sensor and adjustable opening height.",
-    x: 0.32,
-    y: 0.4,
-    frames: [12, 24],
+    x: 0.58,
+    y: 0.42,
+    frames: [28, 36],
   },
 ];
 
